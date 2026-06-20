@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional
 from urllib.parse import urlparse
+import os
 
 from converter import process
 
@@ -21,7 +22,7 @@ from PySide6.QtGui import QGuiApplication
 from PySide6.QtQml import QQmlApplicationEngine
 
 
-CONFIG_FILE = Path(__file__).with_name("config.json")
+CONFIG_FILE = Path(os.path.join(os.path.expanduser("~"), ".config/pictureframe-tool"))
 
 
 @dataclass(frozen=True)
