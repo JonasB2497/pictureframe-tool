@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-deb:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,6 +20,11 @@ jobs:
 
       - name: Install fpm
         run: gem install fpm --no-document
+
+      - name: Install lrelease
+        run: |
+          sudo apt-get update
+          sudo apt-get install pyside6-tools
 
       - name: Make build script executable
         run: chmod +x build.sh
