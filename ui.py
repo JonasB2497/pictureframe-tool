@@ -13,6 +13,8 @@ from PySide6.QtCore import (
     QAbstractListModel,
     QByteArray,
     QModelIndex,
+    QLocale,
+    QTranslator,
     Qt,
     Signal,
     Property,
@@ -23,6 +25,9 @@ from PySide6.QtQml import QQmlApplicationEngine
 
 
 CONFIG_FILE = Path(os.path.join(os.path.expanduser("~"), ".config/pictureframe-tool"))
+
+TRANSLATION_DIR = Path(__file__).resolve().parent / "ui/i18n"
+TRANSLATION_CONTEXT = "pictureframe-tool"
 
 
 @dataclass(frozen=True)
@@ -370,8 +375,18 @@ def _load_from_disk() -> Optional[tuple[List[Device], Optional[str], Optional[st
     return devices, last_device, last_input_directory, last_output_directory
 
 
+def _load_translator(app: QGuiApplication) -> QTranslator:
+    translator = QTranslator(app)
+    locale = QLocale.system()
+    if TRANSLATION_DIR.is_dir():
+        translator.load(locale, TRANSLATION_CONTEXT, "_", str(TRANSLATION_DIR), ".qm")
+    app.installTranslator(translator)
+    return translator
+
+
 def main() -> int:
     app = QGuiApplication(sys.argv)
+    _load_translator(app)
     engine = QQmlApplicationEngine()
     engine.addImportPath(sys.path[0])
 

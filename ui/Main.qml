@@ -23,7 +23,7 @@ ApplicationWindow {
         if (maximumHeight !== height) maximumHeight = height
     }
     visible: true
-    title: "Generator"
+    title: qsTr("Generator")
 
     property string inputDirectory: ""
     property string outputDirectory: ""
@@ -52,15 +52,16 @@ ApplicationWindow {
                     Layout.fillWidth: true
                     horizontalAlignment: Text.AlignHCenter
                     text: deviceConfiguration.count > 0
-                        ? "Device: " + deviceConfiguration.currentName
-                          + " (" + deviceConfiguration.currentWidth
-                          + "x" + deviceConfiguration.currentHeight + ")"
-                        : "No device selected"
+                        ? qsTr("Device: %1 (%2x%3)")
+                          .arg(deviceConfiguration.currentName)
+                          .arg(deviceConfiguration.currentWidth)
+                          .arg(deviceConfiguration.currentHeight)
+                        : qsTr("No device selected")
                 }
 
                 // Input directory
                 Label {
-                    text: "Input Directory"
+                    text: qsTr("Input Directory")
                 }
 
                 RowLayout {
@@ -69,20 +70,20 @@ ApplicationWindow {
                     TextField {
                         Layout.fillWidth: true
                         readOnly: true
-                        placeholderText: "Select input directory..."
+                        placeholderText: qsTr("Select input directory...")
                         text: deviceConfiguration.lastInputDirectory
                         onTextChanged: deviceConfiguration.lastInputDirectory = text
                     }
 
                     Button {
-                        text: "Browse"
+                        text: qsTr("Browse")
                         onClicked: inputDirDialog.open()
                     }
                 }
 
                 // Output directory
                 Label {
-                    text: "Output Directory"
+                    text: qsTr("Output Directory")
                 }
 
                 RowLayout {
@@ -91,20 +92,20 @@ ApplicationWindow {
                     TextField {
                         Layout.fillWidth: true
                         readOnly: true
-                        placeholderText: "Select output directory..."
+                        placeholderText: qsTr("Select output directory...")
                         text: deviceConfiguration.lastOutputDirectory
                         onTextChanged: deviceConfiguration.lastOutputDirectory = text
                     }
 
                     Button {
-                        text: "Browse"
+                        text: qsTr("Browse")
                         onClicked: outputDirDialog.open()
                     }
                 }
 
                 // Generate button
                 Button {
-                    text: "Generate"
+                    text: qsTr("Generate")
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignBottom
                     onClicked: {
                         generateDialog.open()
@@ -122,7 +123,7 @@ ApplicationWindow {
             ColumnLayout {
                 // Device dropdown
                 Label {
-                    text: "Device"
+                    text: qsTr("Device")
                 }
 
                 RowLayout {
@@ -139,26 +140,18 @@ ApplicationWindow {
 
                     Button {
                         text: "+"
-                        implicitWidth: 28
-                        implicitHeight: 28
-                        Layout.preferredWidth: 28
-                        Layout.preferredHeight: 28
                         padding: 0
-                        ToolTip.text: "Add device configuration"
+                        ToolTip.text: qsTr("Add device configuration")
                         ToolTip.visible: hovered
                         ToolTip.delay: 500
                         onClicked: deviceConfiguration.addDevice()
                     }
 
                     Button {
-                        text: "\u2212"
-                        implicitWidth: 28
-                        implicitHeight: 28
-                        Layout.preferredWidth: 28
-                        Layout.preferredHeight: 28
+                        text: "-"
                         padding: 0
                         enabled: deviceConfiguration.count > 1
-                        ToolTip.text: "Remove selected device configuration"
+                        ToolTip.text: qsTr("Remove selected device configuration")
                         ToolTip.visible: hovered
                         ToolTip.delay: 500
                         onClicked: deviceConfiguration.removeCurrentDevice()
@@ -167,7 +160,7 @@ ApplicationWindow {
 
                 // Name field
                 Label {
-                    text: "Name"
+                    text: qsTr("Name")
                 }
 
                 RowLayout {
@@ -176,7 +169,7 @@ ApplicationWindow {
                     TextField {
                         id: deviceNameField
                         Layout.fillWidth: true
-                        placeholderText: "Device name..."
+                        placeholderText: qsTr("Device name...")
                         text: deviceConfiguration.currentName
                         onTextEdited: deviceConfiguration.updateDevice(deviceCombo.currentIndex, text, parseInt(deviceWidthField.text), parseInt(deviceHeightField.text))
                     }
@@ -184,7 +177,7 @@ ApplicationWindow {
 
                 // Width field
                 Label {
-                    text: "Width"
+                    text: qsTr("Width")
                 }
 
                 RowLayout {
@@ -193,7 +186,7 @@ ApplicationWindow {
                     TextField {
                         id: deviceWidthField
                         Layout.fillWidth: true
-                        placeholderText: "Enter width..."
+                        placeholderText: qsTr("Enter width...")
                         text: deviceConfiguration.currentWidth
                         validator: IntValidator { bottom: 1 }
                         onTextEdited: deviceConfiguration.updateDevice(deviceCombo.currentIndex, deviceNameField.text, parseInt(text), parseInt(deviceHeightField.text))
@@ -201,7 +194,7 @@ ApplicationWindow {
                 }
 
                 Label {
-                    text: "Height"
+                    text: qsTr("Height")
                 }
 
                 RowLayout {
@@ -210,7 +203,7 @@ ApplicationWindow {
                     TextField {
                         id: deviceHeightField
                         Layout.fillWidth: true
-                        placeholderText: "Enter height..."
+                        placeholderText: qsTr("Enter height...")
                         text: deviceConfiguration.currentHeight
                         validator: IntValidator { bottom: 1 }
                         onTextEdited: deviceConfiguration.updateDevice(deviceCombo.currentIndex, deviceNameField.text, parseInt(deviceWidthField.text), parseInt(text))
@@ -223,7 +216,7 @@ ApplicationWindow {
     // Input directory dialog
     FolderDialog {
         id: inputDirDialog
-        title: "Select Input Directory"
+        title: qsTr("Select Input Directory")
         onAccepted: {
             deviceConfiguration.lastInputDirectory = selectedFolder
         }
@@ -232,7 +225,7 @@ ApplicationWindow {
     // Output directory dialog
     FolderDialog {
         id: outputDirDialog
-        title: "Select Output Directory"
+        title: qsTr("Select Output Directory")
         onAccepted: {
             deviceConfiguration.lastOutputDirectory = selectedFolder
         }
@@ -241,8 +234,8 @@ ApplicationWindow {
     // Generate warning dialog
     MessageDialog {
         id: generateDialog
-        title: "Confirm Generate"
-        text: "The content of the output folder will be irreversibly deleted."
+        title: qsTr("Confirm Generate")
+        text: qsTr("The content of the output folder will be irreversibly deleted.")
         buttons: MessageDialog.Yes | MessageDialog.No
         onButtonClicked: function(button, role) {
             if (role === MessageDialog.YesRole) {
@@ -257,8 +250,8 @@ ApplicationWindow {
     // Done notification dialog
     MessageDialog {
         id: doneDialog
-        title: "Done"
-        text: "Processing completed successfully."
+        title: qsTr("Done")
+        text: qsTr("Processing completed successfully.")
         buttons: MessageDialog.Ok
     }
 

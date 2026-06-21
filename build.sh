@@ -18,6 +18,7 @@ DEPENDS=("python3" "python3-pyside6" "python3-pillow")
 SRC_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BUILD_DIR="${SRC_DIR}/build/package"
 OUTPUT_DIR="${SRC_DIR}/build"
+INSTALL_PREFIX="/opt/${NAME}"
 
 # files to ship (relative to project root)
 PACKAGE_FILES=(
@@ -27,8 +28,9 @@ PACKAGE_FILES=(
     "ui"
 )
 
-# install location on the target system
-INSTALL_PREFIX="/opt/${NAME}"
+# translations (compiled from .ts to .qm at build time)
+I18N_DIR="ui/i18n"
+qm_files=()
 
 # --- helpers ---
 err() { echo "error: $*" >&2; }
@@ -40,14 +42,36 @@ command -v fpm >/dev/null 2>&1 || die "fpm not found. Install it:
   or:
     apt-get install ruby ruby-dev && gem install fpm"
 
+command -v pyside6-lrelease >/dev/null 2>&1 \
+    || die "pyside6-lrelease not found. Install it:
+    apt-get install pyside6-tools"
+LRELEASE="pyside6-lrelease"
+
+command -v ar >/dev/null 2>&1 \
+    || die "ar not found. Install it:
+    apt-get install binutils"
+
+
+
 # --- prepare staging dir ---
 rm -rf "${BUILD_DIR}"
-mkdir -p "${INSTALL_PREFIX#/}"  # strip leading /
 STAGING="$(mktemp -d)"
 trap 'rm -rf "${STAGING}"' EXIT
 
 DEST="${STAGING}${INSTALL_PREFIX}"
 mkdir -p "${DEST}"
+
+# compile translations (.ts -> .qm) and copy them next to the sources
+if ls "${SRC_DIR}/${I18N_DIR}"/*.ts >/dev/null 2>&1; then
+    mkdir -p "${DEST}/${I18N_DIR}"
+    for ts in "${SRC_DIR}/${I18N_DIR}"/*.ts; do
+        qm="${DEST}/${I18N_DIR}/$(basename "${ts%.*}.qm")"
+        "${LRELEASE}" "${ts}" -qm "${qm}" \
+            || die "failed to compile translation: ${ts}"
+        qm_files+=("${qm}")
+        echo "compiled translation: $(basename "${ts}")"
+    done
+fi
 
 for f in "${PACKAGE_FILES[@]}"; do
     src="${SRC_DIR}/${f}"
@@ -61,8 +85,12 @@ for f in "${PACKAGE_FILES[@]}"; do
     fi
 done
 
-# make CLI entrypoint executable
+# drop the stale .ts source files from the staging copy; only ship .qm
+rm -f "${DEST}/${I18N_DIR}"/*.ts
+
+# make entrypoints executable
 chmod +x "${DEST}/cli.py" 2>/dev/null || true
+chmod +x "${DEST}/ui.py" 2>/dev/null || true
 
 # wrapper script so users get a command on PATH
 BIN_DIR="${STAGING}/usr/bin"
