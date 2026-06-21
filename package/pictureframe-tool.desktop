@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Pictureframe Tool
+Name[de]=Bilderrahmen Verwalter
+GenericName=Pictureframe Tool
+GenericName[de]=Bilderrahmen Verwalter
+Comment=Open-source tool for managing digital picture frames
+Exec=pictureframe-tool-ui
+Icon=pictureframe-tool
+Terminal=false
+Categories=Graphics;Viewer;Photography

@@ -107,6 +107,12 @@ exec python3 "${INSTALL_PREFIX}/ui.py" "\$@"
 EOF
 chmod +x "${BIN_DIR}/${NAME}-ui"
 
+# add menu entry
+mkdir -p ${STAGING}/usr/share/applications
+mkdir -p ${STAGING}/usr/share/icons/hicolor/512x512/apps/
+cp ${SRC_DIR}/package/pictureframe-tool.desktop ${STAGING}/usr/share/applications/
+cp ${SRC_DIR}/package/pictureframe-tool.png ${STAGING}/usr/share/icons/hicolor/512x512/apps/
+
 # --- build depends flags ---
 depends_args=()
 for d in "${DEPENDS[@]}"; do
